@@ -6,9 +6,14 @@ import { readSettings, updateSettings } from "~/lib/store";
 const schema = z.object({
   pollIntervalMinutes: z.number().finite().positive(),
   maxItemsPerSource: z.number().int().positive(),
-  llmBaseURL: z.string().url(),
-  llmModel: z.string().min(1),
-  llmApiKey: z.string().optional(),
+  llmProviderMode: z.enum(["lm-studio", "openai-compatible"]),
+  lmStudioBaseURL: z.string(),
+  lmStudioModel: z.string(),
+  lmStudioApiKey: z.string().optional(),
+  openaiBaseURL: z.string(),
+  openaiModel: z.string(),
+  openaiApiKey: z.string().optional(),
+  openaiContextTokens: z.number().int().positive(),
   generalGuidance: z.string().max(5_000),
 });
 

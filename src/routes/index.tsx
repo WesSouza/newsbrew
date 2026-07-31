@@ -160,9 +160,14 @@ export default function Home() {
   const [topicReaction, setTopicReaction] = createSignal<Reaction>("like");
   const [pollInterval, setPollInterval] = createSignal("30");
   const [maxItems, setMaxItems] = createSignal("8");
-  const [llmBaseURL, setLlmBaseURL] = createSignal("");
-  const [llmModel, setLlmModel] = createSignal("");
-  const [llmApiKey, setLlmApiKey] = createSignal("");
+  const [llmProviderMode, setLlmProviderMode] = createSignal<"lm-studio" | "openai-compatible">("lm-studio");
+  const [lmStudioBaseURL, setLmStudioBaseURL] = createSignal("");
+  const [lmStudioModel, setLmStudioModel] = createSignal("");
+  const [lmStudioApiKey, setLmStudioApiKey] = createSignal("");
+  const [openaiBaseURL, setOpenaiBaseURL] = createSignal("");
+  const [openaiModel, setOpenaiModel] = createSignal("");
+  const [openaiApiKey, setOpenaiApiKey] = createSignal("");
+  const [openaiContextTokens, setOpenaiContextTokens] = createSignal("131072");
   const [generalGuidance, setGeneralGuidance] = createSignal("");
   const [accessTokenAttempt, setAccessTokenAttempt] = createSignal("");
   const [accessTokenDraft, setAccessTokenDraft] = createSignal("");
@@ -360,8 +365,12 @@ export default function Home() {
       }
       setPollInterval(String(next.runtime.pollIntervalMinutes));
       setMaxItems(String(next.runtime.maxItemsPerSource));
-      setLlmBaseURL(next.llm.baseURL);
-      setLlmModel(next.llm.model);
+      setLlmProviderMode(next.llm.providerMode);
+      setLmStudioBaseURL(next.llm.lmStudio.baseURL);
+      setLmStudioModel(next.llm.lmStudio.model);
+      setOpenaiBaseURL(next.llm.openai.baseURL);
+      setOpenaiModel(next.llm.openai.model);
+      setOpenaiContextTokens(String(next.llm.openai.contextTokens));
       setGeneralGuidance(next.filter.generalGuidance);
       if (options.clearNotice) setNotice("");
     } catch (error) {
@@ -777,17 +786,23 @@ export default function Home() {
         body: JSON.stringify({
           pollIntervalMinutes: Number(pollInterval()),
           maxItemsPerSource: Number(maxItems()),
-          llmBaseURL: llmBaseURL(),
-          llmModel: llmModel(),
+          llmProviderMode: llmProviderMode(),
+          lmStudioBaseURL: lmStudioBaseURL(),
+          lmStudioModel: lmStudioModel(),
+          openaiBaseURL: openaiBaseURL(),
+          openaiModel: openaiModel(),
+          openaiContextTokens: Number(openaiContextTokens()),
           generalGuidance: generalGuidance(),
-          ...(llmApiKey() ? { llmApiKey: llmApiKey() } : {}),
+          ...(lmStudioApiKey() ? { lmStudioApiKey: lmStudioApiKey() } : {}),
+          ...(openaiApiKey() ? { openaiApiKey: openaiApiKey() } : {}),
         }),
       });
       const body = (await response.json()) as { error?: string };
       if (!response.ok) {
         throw new Error(body.error ?? "Could not save settings");
       }
-      setLlmApiKey("");
+      setLmStudioApiKey("");
+      setOpenaiApiKey("");
       await load();
       setNotice("Settings saved.");
     } catch (error) {
@@ -1439,36 +1454,98 @@ export default function Home() {
                 />
               </label>
               <label>
-                Responses API base URL
-                <input
-                  required
-                  type="url"
-                  value={llmBaseURL()}
-                  onInput={(event) => setLlmBaseURL(event.currentTarget.value)}
-                />
-              </label>
-              <label>
-                Model
-                <input
-                  required
-                  value={llmModel()}
-                  onInput={(event) => setLlmModel(event.currentTarget.value)}
-                />
-              </label>
-              <label>
-                API key
-                <input
-                  type="password"
-                  autocomplete="new-password"
-                  placeholder={
-                    state()?.llm.hasApiKey
-                      ? "Stored — leave blank to keep"
-                      : "API key"
+                Provider
+                <select
+                  value={llmProviderMode()}
+                  onChange={(event) =>
+                    setLlmProviderMode(event.currentTarget.value as "lm-studio" | "openai-compatible")
                   }
-                  value={llmApiKey()}
-                  onInput={(event) => setLlmApiKey(event.currentTarget.value)}
-                />
+                >
+                  <option value="lm-studio">LM Studio</option>
+                  <option value="openai-compatible">OpenAI Compatible</option>
+                </select>
               </label>
+              <Show when={llmProviderMode() === "lm-studio"}>
+                <label>
+                  Responses API base URL
+                  <input
+                    required
+                    type="url"
+                    value={lmStudioBaseURL()}
+                    onInput={(event) => setLmStudioBaseURL(event.currentTarget.value)}
+                  />
+                </label>
+                <label>
+                  Model
+                  <input
+                    required
+                    value={lmStudioModel()}
+                    onInput={(event) => setLmStudioModel(event.currentTarget.value)}
+                  />
+                </label>
+                <label>
+                  API key
+                  <input
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder={
+                      state()?.llm.lmStudio.hasApiKey
+                        ? "Stored — leave blank to keep"
+                        : "API key"
+                    }
+                    value={lmStudioApiKey()}
+                    onInput={(event) => setLmStudioApiKey(event.currentTarget.value)}
+                  />
+                </label>
+              </Show>
+              <Show when={llmProviderMode() === "openai-compatible"}>
+                <label>
+                  API base URL
+                  <input
+                    required
+                    type="url"
+                    value={openaiBaseURL()}
+                    onInput={(event) => setOpenaiBaseURL(event.currentTarget.value)}
+                  />
+                </label>
+                <label>
+                  Model
+                  <input
+                    required
+                    value={openaiModel()}
+                    onInput={(event) => setOpenaiModel(event.currentTarget.value)}
+                  />
+                </label>
+                <label>
+                  API key
+                  <input
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder={
+                      state()?.llm.openai.hasApiKey
+                        ? "Stored — leave blank to keep"
+                        : "API key"
+                    }
+                    value={openaiApiKey()}
+                    onInput={(event) => setOpenaiApiKey(event.currentTarget.value)}
+                  />
+                </label>
+                <label>
+                  Context window tokens
+                  <input
+                    required
+                    type="number"
+                    min="1024"
+                    step="1"
+                    value={openaiContextTokens()}
+                    onInput={(event) => setOpenaiContextTokens(event.currentTarget.value)}
+                  />
+                  <span>
+                    The maximum context size for your model (e.g. 131072 for
+                    Qwen).
+                  </span>
+                </label>
+              </Show>
               <Button type="submit" variant="accent" class="w-full">
                 <Check size={14} /> Save settings
               </Button>
