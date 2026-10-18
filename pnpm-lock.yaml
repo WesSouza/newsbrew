@@ -1512,8 +1512,8 @@ packages:
     peerDependencies:
       solid-js: ^1.7
 
-  source-map-js@1.2.1:
-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
+  source-map-js@1.2.2:
+    resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
     engines: {node: '>=0.10.0'}
 
   space-separated-tokens@2.0.2:
@@ -2197,7 +2197,7 @@ snapshots:
       seroval-plugins: 1.5.5(seroval@1.5.5)
       shiki: 1.29.2
       solid-js: 1.9.11
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
       srvx: 0.11.22
       terracotta: 1.1.0(solid-js@1.9.11)
       vite: 8.1.4(@types/node@24.13.3)(esbuild@0.27.7)
@@ -2216,7 +2216,7 @@ snapshots:
       jiti: 2.6.1
       lightningcss: 1.31.1
       magic-string: 0.30.21
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
       tailwindcss: 4.2.1
 
   '@tailwindcss/oxide-android-arm64@4.2.1':
@@ -2937,7 +2937,7 @@ snapshots:
     dependencies:
       nanoid: 3.3.16
       picocolors: 1.1.1
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
 
   property-information@7.1.0: {}
 
@@ -3050,7 +3050,7 @@ snapshots:
     dependencies:
       solid-js: 1.9.11
 
-  source-map-js@1.2.1: {}
+  source-map-js@1.2.2: {}
 
   space-separated-tokens@2.0.2: {}
 
